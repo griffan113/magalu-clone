@@ -1,0 +1,59 @@
+services:
+  postgres:
+    container_name: ms_postgres
+    image: postgres
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      PGDATA: /var/lib/postgresql/data
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - magalu-net
+    restart: unless-stopped
+
+  mongodb:
+    container_name: ms_mongodb
+    image: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo:/data
+    networks:
+      - magalu-net
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=admin
+    restart: unless-stopped
+
+  mongo-express:
+    container_name: ms_mongo_express
+    image: mongo-express
+    ports:
+      - "8081:8081"
+    environment:
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=admin
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=admin
+      - ME_CONFIG_MONGODB_SERVER=mongodb
+    networks:
+      - magalu-net
+    restart: unless-stopped
+
+  mailhog:
+    image: mailhog/mailhog:latest
+    ports:
+      - '1025:1025' # SMTP server
+      - '8025:8025' # Web UI
+    environment:
+      MH_STORAGE: memory
+      MH_CORS_ORIGIN: '*'
+
+networks:
+  magalu-net:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  mongo:
